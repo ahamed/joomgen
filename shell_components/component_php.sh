@@ -20,14 +20,20 @@ create_component_php() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-if(file_exists(JPATH_COMPONENT.'/vendor/autoload.php')){
+use Joomla\CMS\Language\Text;
+
+if(file_exists(JPATH_COMPONENT.'/vendor/autoload.php'))
+{
   include JPATH_COMPONENT.'/vendor/autoload.php';
 }
 
-if(!JFactory::getUser()->authorise('core.manage','com_${cName}')){
-  return JError::raiseWarning(404,JText::_('JERROR_ALERTNOAUTHOR'));
+if(!JFactory::getUser()->authorise('core.manage','com_${cName}'))
+{
+  return JError::raiseWarning(404,Text::_('JERROR_ALERTNOAUTHOR'));
 }
-if(file_exists(JPATH_COMPONENT.'/helpers/${cName}.php')){
+
+if(file_exists(JPATH_COMPONENT.'/helpers/${cName}.php'))
+{
   JLoader::register('${name_ucf}Helper', JPATH_COMPONENT . '/helpers/${cName}.php');
 }
 

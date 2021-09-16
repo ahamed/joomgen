@@ -19,8 +19,10 @@ create_controller_f_php() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class ${cname_ucf}Controller extends JControllerLegacy {
-  public function display(\$cachable=false, \$urlparams=false) {
+class ${cname_ucf}Controller extends JControllerLegacy
+{
+  public function display(\$cachable=false, \$urlparams=false)
+  {
     parent::display(\$cachable,\$urlparams);
     return \$this;
   }

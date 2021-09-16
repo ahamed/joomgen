@@ -19,17 +19,23 @@ create_installer_script_php() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class com_${cName}InstallerScript {
+use Joomla\CMS\Factory;
+use Joomla\CMS\Installer\Installer;
 
-    public function uninstall(\$parent) {
+class com_${cName}InstallerScript
+{
+
+    public function uninstall(\$parent)
+    {
 
         \$extensions = array(
             array('type'=>'module', 'name'=>'module_name'),
             array('type'=>'plugin', 'name'=>'plugin_name')
         );
 
-        foreach (\$extensions as \$key => \$extension) {
-            \$db = JFactory::getDbo();         
+        foreach (\$extensions as \$key => \$extension)
+        {
+            \$db = Factory::getDbo();         
             \$query = \$db->getQuery(true);         
             \$query->select(\$db->quoteName(array('extension_id')));
             \$query->from(\$db->quoteName('#__extensions'));
@@ -38,26 +44,30 @@ class com_${cName}InstallerScript {
             \$db->setQuery(\$query); 
             \$id = \$db->loadResult();
 
-            if(isset(\$id) && \$id) {
-                \$installer = new JInstaller;
+            if(isset(\$id) && \$id)
+            {
+                \$installer = new Installer;
                 \$result = \$installer->uninstall(\$extension['type'], \$id);
             }
         }
     }
 
-    function postflight(\$type, \$parent) {
+    function postflight(\$type, \$parent)
+    {
         \$extensions = array(
             array('type'=>'module', 'name'=>'module_name'),
             array('type'=>'plugin', 'name'=>'plugin_name', 'group'=>'system')
         );
 
-        foreach (\$extensions as \$key => \$extension) {
+        foreach (\$extensions as \$key => \$extension)
+        {
             \$ext = \$parent->getParent()->getPath('source') . '/' . \$extension['type'] . 's/' . \$extension['name'];
-            \$installer = new JInstaller;
+            \$installer = new Installer;
             \$installer->install(\$ext);
 
-            if(\$extension['type'] == 'plugin') {
-                \$db = JFactory::getDbo();
+            if(\$extension['type'] == 'plugin')
+            {
+                \$db = Factory::getDbo();
                 \$query = \$db->getQuery(true); 
                 
                 \$fields = array(\$db->quoteName('enabled') . ' = 1');

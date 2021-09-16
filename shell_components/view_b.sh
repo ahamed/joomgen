@@ -40,18 +40,23 @@ write_singular_controller(){
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
+use Joomla\CMS\Factory;
+
 class "${component_ucf}"Controller"${singular_ucf}" extends JControllerForm {
-	public function __construct(\$config = array()) {
+	public function __construct(\$config = array())
+	{
 		parent::__construct(\$config);
 	}
 
-	protected function allowAdd(\$data = array()) {
+	protected function allowAdd(\$data = array())
+	{
 		return parent::allowAdd(\$data);
 	}
 
-	protected function allowEdit(\$data = array(), \$key = 'id') {
+	protected function allowEdit(\$data = array(), \$key = 'id')
+	{
         \$id = (int) isset(\$data[\$key]) ? \$data[\$key] : 0;
-		\$user = JFactory::getUser();
+		\$user = Factory::getUser();
 
 		if (!\$id) {
 			return parent::allowEdit(\$data, \$key);
@@ -87,10 +92,13 @@ write_plural_controller(){
 
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
+use Joomla\CMS\Factory;
 use Joomla\Utilities\ArrayHelper;
 
-class "${component_ucf}"Controller"${plural_ucf}" extends JControllerAdmin {
-	public function getModel(\$name = '${singular_ucf}', \$prefix = '"${component_ucf}"Model', \$config = array('ignore_request' => true)) {
+class "${component_ucf}"Controller"${plural_ucf}" extends JControllerAdmin
+{
+	public function getModel(\$name = '${singular_ucf}', \$prefix = '"${component_ucf}"Model', \$config = array('ignore_request' => true))
+	{
 		\$model = parent::getModel(\$name, \$prefix, \$config);
 		return \$model;
 	}
@@ -111,81 +119,108 @@ write_singular_model(){
 
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Table;
 use Joomla\String\StringHelper;
 
-class "${component_ucf}"Model"${singular_ucf}" extends JModelAdmin {
+class "${component_ucf}"Model"${singular_ucf}" extends JModelAdmin
+{
 	protected \$text_prefix = 'COM_${component_uca}';
 
-	public function getTable(\$name = '${singular_ucf}', \$prefix = '"${component_ucf}"Table', \$config = array()) {
-		return JTable::getInstance(\$name, \$prefix, \$config);
+	public function getTable(\$name = '${singular_ucf}', \$prefix = '"${component_ucf}"Table', \$config = array())
+	{
+		return Table::getInstance(\$name, \$prefix, \$config);
 	}
 
-	public function getForm(\$data = array(), \$loadData = true) {
-		\$app = JFactory::getApplication();
+	public function getForm(\$data = array(), \$loadData = true)
+	{
+		\$app = Factory::getApplication();
 		\$form = \$this->loadForm('com_${component_name}.${vSingular}','${vSingular}',array('control' => 'jform', 'load_data' => \$loadData));
 
-		if (empty(\$form)) {
+		if (empty(\$form))
+		{
 			return false;
 		}
+
 		return \$form;
 	}
 
-	public function loadFormData() {
-		\$data = JFactory::getApplication()
+	public function loadFormData()
+	{
+		\$data = Factory::getApplication()
 			->getUserState('com_${component_name}.edit.${vSingular}.data',array());
 
-		if (empty(\$data)) {
+		if (empty(\$data))
+		{
 			\$data = \$this->getItem();
 		}
+
 		return \$data;
 	}
 
-	protected function canDelete(\$record) {
-		if (!empty(\$record->id)) {
-			if (\$record->published != -2) {
+	protected function canDelete(\$record)
+	{
+		if (!empty(\$record->id))
+		{
+			if (\$record->published != -2)
+			{
 				return ;
 			}
-			\$user = JFactory::getUser();
+
+			\$user = Factory::getUser();
+
 			return parent::canDelete(\$record);
 		}
 	}
 
-	protected function canEditState(\$record) {
+	protected function canEditState(\$record)
+	{
 		return parent::canEditState(\$record);
 	}
 
-	public function getItem(\$pk = null) {
+	public function getItem(\$pk = null)
+	{
 		return parent::getItem(\$pk);
 	}
 
-  private function generateNewTitleLocally(\$alias, \$title) {
+  private function generateNewTitleLocally(\$alias, \$title)
+  {
     // Alter the title & alias
     \$table = \$this->getTable();
 
-    while (\$table->load(array('alias' => \$alias))) {
+    while (\$table->load(array('alias' => \$alias)))
+	{
       \$title = StringHelper::increment(\$title);
       \$alias = StringHelper::increment(\$alias, 'dash');
     }
+
     return array(\$title, \$alias);
   }
 
-	public function save(\$data) {
-		\$input 	= JFactory::getApplication()->input;
+	public function save(\$data)
+	{
+		\$input = Factory::getApplication()->input;
 		\$task 	= \$input->get('task');
 
-		if (\$task == 'save2copy') {
+		if (\$task === 'save2copy')
+		{
 			\$originalTable = clone \$this->getTable();
 			\$originalTable->load(\$input->getInt('id'));
 
-			if (\$data['title'] == \$originalTable->title) {
+			if (\$data['title'] == \$originalTable->title)
+			{
 				list(\$title, \$alias) = \$this->generateNewTitleLocally(\$data['alias'], \$data['title']);
 				\$data['title'] = \$title;
 				\$data['alias'] = \$alias;
-			} else {
-				if (\$data['alias'] == \$originalTable->alias) {
+			}
+			else
+			{
+				if (\$data['alias'] === \$originalTable->alias)
+				{
 					\$data['alias'] = '';
 				}
 			}
+
 			\$data['published'] = 0;
 		}
 		if (parent::save(\$data))
@@ -210,9 +245,14 @@ write_plural_model(){
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class "${component_ucf}"Model"${plural_ucf}" extends JModelList {
-	public function __construct(array \$config = array()) {
-		if (empty(\$config['filter_fields'])) {
+use Joomla\CMS\Factory;
+
+class "${component_ucf}"Model"${plural_ucf}" extends JModelList
+{
+	public function __construct(array \$config = array())
+	{
+		if (empty(\$config['filter_fields']))
+		{
 			\$config['filter_fields'] = [
 				'id','a.id',
 				'title', 'a.title',
@@ -226,8 +266,9 @@ class "${component_ucf}"Model"${plural_ucf}" extends JModelList {
 		parent::__construct(\$config);
 	}
 
-	protected function populateState(\$ordering = 'a.ordering', \$direction = 'asc') {
-		\$app = JFactory::getApplication();
+	protected function populateState(\$ordering = 'a.ordering', \$direction = 'asc')
+	{
+		\$app = Factory::getApplication();
 		\$context = \$this->context;
 
 		\$search = \$this->getUserStateFromRequest(\$this->context . '.filter.search', 'filter_search');
@@ -245,7 +286,8 @@ class "${component_ucf}"Model"${plural_ucf}" extends JModelList {
 		parent::populateState(\$ordering, \$direction);
 	}
 
-	protected function getStoreId(\$id = '') {
+	protected function getStoreId(\$id = '')
+	{
 		\$id .= ':' . \$this->getState('filter.search');
 		\$id .= ':' . \$this->getState('filter.access');
 		\$id .= ':' . \$this->getState('filter.published');
@@ -254,10 +296,11 @@ class "${component_ucf}"Model"${plural_ucf}" extends JModelList {
 		return parent::getStoreId(\$id);
 	}
 
-	protected function getListQuery() {
-		\$app 	= JFactory::getApplication();
+	protected function getListQuery()
+	{
+		\$app 	= Factory::getApplication();
 		\$state = \$this->get('State');
-		\$db 	= JFactory::getDbo();
+		\$db 	= Factory::getDbo();
 		\$query = \$db->getQuery(true);
 
 		\$query->select('a.*, l.title_native as lang');
@@ -306,72 +349,98 @@ write_table(){
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class "${component_ucf}"Table"${singular_ucf}" extends JTable {
-	public function __construct(&\$db) {
+use Joomla\CMS\Application\ApplicationHelper;
+use Joomla\CMS\Date\Date;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Table;
+
+class "${component_ucf}"Table"${singular_ucf}" extends Table
+{
+	public function __construct(&\$db)
+	{
 		parent::__construct('${table_name}', 'id', \$db);
 	}
 
-	public function bind(\$src, \$ignore = array()) {
+	public function bind(\$src, \$ignore = array())
+	{
 		return parent::bind(\$src, \$ignore);
 	}
 
-	public function store(\$updateNulls = false) {
-		\$user = JFactory::getUser();
-		\$app  = JFactory::getApplication();
-		\$date = new JDate('now', \$app->getCfg('offset'));
+	public function store(\$updateNulls = false)
+	{
+		\$user = Factory::getUser();
+		\$app  = Factory::getApplication();
+		\$date = new Date('now', \$app->getCfg('offset'));
 
-		if (\$this->id) {
+		if (\$this->id)
+		{
 			\$this->modified = (string)\$date;
 			\$this->modified_by = \$user->get('id');
 		}
 
-		if (empty(\$this->created)) {
+		if (empty(\$this->created))
+		{
 			\$this->created = (string)\$date;
 		}
 
-		if (empty(\$this->created_by)) {
+		if (empty(\$this->created_by))
+		{
 			\$this->created_by = \$user->get('id');
 		}
 
-		\$table = JTable::getInstance('${singular_ucf}','"${component_ucf}"Table');
+		\$table = Table::getInstance('${singular_ucf}','"${component_ucf}"Table');
 
-		if (\$table->load(['alias' => \$this->alias]) && (\$table->id != \$this->id || \$this->id == 0)) {
-			\$this->setError(JText::_('COM_"${component_uca}"_ERROR_UNIQUE_ALIAS'));
+		if (\$table->load(['alias' => \$this->alias]) && (\$table->id != \$this->id || \$this->id == 0))
+		{
+			\$this->setError(Text::_('COM_"${component_uca}"_ERROR_UNIQUE_ALIAS'));
 			return false;
 		}
+
 		return parent::store(\$updateNulls);
 	}
 
-	public function check() {
-		if (trim(\$this->title) == '') {
+	public function check()
+	{
+		if (trim(\$this->title) == '')
+		{
 			throw new UnexpectedValueException(sprintf('The title is empty'));
 		}
+
         \$this->handleAlias();
+
 		return true;
     }
 
-    private function handleAlias() {
-        if (empty(\$this->alias)) {
+    private function handleAlias()
+	{
+        if (empty(\$this->alias))
+		{
 			\$this->alias = \$this->title;
 		}
 
-		\$this->alias = JApplicationHelper::stringURLSafe(\$this->alias, \$this->language);
+		\$this->alias = ApplicationHelper::stringURLSafe(\$this->alias, \$this->language);
 
-		if (trim(str_replace('-','',\$this->alias)) == '') {
-			\$this->alias = JFactory::getDate()->format('Y-m-d-H-i-s');
+		if (trim(str_replace('-','',\$this->alias)) === '')
+		{
+			\$this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
 		}
     }
 
-	public function publish(\$pks = null, \$published = 1, \$userId = 0) {
+	public function publish(\$pks = null, \$published = 1, \$userId = 0)
+	{
 		\$k = \$this->_tbl_key;
 		JArrayHelper::toInteger(\$pks);
 		\$publilshed = (int) \$published;
 
-		if (empty(\$pks)) {
-			if (\$this->\$k) {
+		if (empty(\$pks))
+		{
+			if (\$this->\$k)
+			{
 				\$pks = array(\$this->\$k);
-			} else {
-				\$this->setError(JText::_('JLIB_DATABASE_ERROR_NO_ROWS_SELECTED'));
+			}
+			else
+			{
+				\$this->setError(Text::_('JLIB_DATABASE_ERROR_NO_ROWS_SELECTED'));
 				return false;
 			}
         }
@@ -384,18 +453,23 @@ class "${component_ucf}"Table"${singular_ucf}" extends JTable {
 
 		\$this->_db->setQuery(\$query);
 
-		try {
+		try
+		{
 			\$this->_db->execute();
-		} catch(RuntimeException \$e) {
+		}
+		catch(\RuntimeException \$e)
+		{
 			\$this->setError(\$e->getMessage());
 			return false;
 		}
 
-		if (in_array(\$this->\$k, \$pks)) {
+		if (in_array(\$this->\$k, \$pks))
+		{
 			\$this->published = \$published;
 		}
 
 		\$this->setError('');
+
 		return true;
 	}
 }
@@ -416,41 +490,52 @@ write_singular_view_dot_html(){
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class "${component_ucf}"View"${singular_ucf}" extends JViewLegacy {
+use Joomla\CMS\Factory;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\MVC\View\HtmlView;
+
+class "${component_ucf}"View"${singular_ucf}" extends HtmlView
+{
 	protected \$item;
 	protected \$form;
 
-	public function display(\$tpl = null) {
+	public function display(\$tpl = null)
+	{
 		\$this->item = \$this->get('Item');
 		\$this->form = \$this->get('Form');
 
-		if (count(\$errors = \$this->get('Errors'))) {
+		if (count(\$errors = \$this->get('Errors')))
+		{
 			JError::raiseError(500, implode('<br>',\$errors));
 			return false;
 		}
 
 		\$this->addToolbar();
+
 		return parent::display(\$tpl);
 	}
 
-	protected function addToolbar() {
-		\$input = JFactory::getApplication()->input;
+	protected function addToolbar()
+	{
+		\$input = Factory::getApplication()->input;
 		\$input->set('hidemainmenu',true);
 
-		\$user = JFactory::getUser();
+		\$user = Factory::getUser();
 		\$userId = \$user->get('id');
 		\$isNew = \$this->item->id == 0;
 		\$canDo = "${component_ucf}"Helper::getActions('com_${component_name}','component');
 
-		JToolbarHelper::title(JText::_('COM_${component_uca}_${singular_uca}_TITLE_' . (\$isNew ? 'ADD' : 'EDIT')), '');
+		ToolbarHelper::title(Text::_('COM_${component_uca}_${singular_uca}_TITLE_' . (\$isNew ? 'ADD' : 'EDIT')), '');
 
-		if (\$canDo->get('core.edit')) {
-			JToolbarHelper::apply('${vSingular}.apply','JTOOLBAR_APPLY');
-			JToolbarHelper::save('${vSingular}.save','JTOOLBAR_SAVE');
-			JToolbarHelper::save2new('${vSingular}.save2new');
-			JToolbarHelper::save2copy('${vSingular}.save2copy');
+		if (\$canDo->get('core.edit'))
+		{
+			ToolbarHelper::apply('${vSingular}.apply','Toolbar_APPLY');
+			ToolbarHelper::save('${vSingular}.save','Toolbar_SAVE');
+			ToolbarHelper::save2new('${vSingular}.save2new');
+			ToolbarHelper::save2copy('${vSingular}.save2copy');
 		}
-		JToolbarHelper::cancel('${vSingular}.cancel','JTOOLBAR_CLOSE');
+
+		ToolbarHelper::cancel('${vSingular}.cancel','Toolbar_CLOSE');
 	}
 }
 	"
@@ -470,14 +555,21 @@ write_plural_view_dot_html(){
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class "${component_ucf}"View"${plural_ucf}" extends JViewLegacy {
+use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\View\HtmlView;
+use Joomla\CMS\Toolbar\Toolbar;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+
+class "${component_ucf}"View"${plural_ucf}" extends HtmlView
+{
 	protected \$items;
 	protected \$state;
 	protected \$pagination;
 	protected \$model;
 	public \$filterForm, \$activeFilters;
 
-	public function display(\$tpl = null) {
+	public function display(\$tpl = null)
+	{
 		\$this->items			= \$this->get('Items');
 		\$this->state			= \$this->get('State');
 		\$this->pagination		= \$this->get('Pagination');
@@ -493,43 +585,52 @@ class "${component_ucf}"View"${plural_ucf}" extends JViewLegacy {
 		}
 
 		\$this->addToolbar();
-		\$this->sidebar = JHtmlSidebar::render();
+		\$this->sidebar = HTMLHelperSidebar::render();
+
 		return parent::display(\$tpl);
 	}
 
-	protected function addToolbar() {
+	protected function addToolbar()
+	{
 		\$state	= \$this->get('State');
 		\$canDo	= "${component_ucf}"Helper::getActions('com_${component_name}','component');
-		\$user	= JFactory::getUser();
-		\$bar	= JToolbar::getInstance('toolbar');
+		\$user	= Factory::getUser();
+		\$bar	= Toolbar::getInstance('toolbar');
 
-		if (\$canDo->get('core.create')) {
-			JToolbarHelper::addNew('${vSingular}.add');
+		if (\$canDo->get('core.create'))
+		{
+			ToolbarHelper::addNew('${vSingular}.add');
 		}
 
-		if (\$canDo->get('core.edit')) {
-			JToolbarHelper::editList('${vSingular}.edit');
+		if (\$canDo->get('core.edit'))
+		{
+			ToolbarHelper::editList('${vSingular}.edit');
 		}
 
-		if (\$canDo->get('core.edit.state')) {
-			JToolbarHelper::publish('${vPlural}.publish','JTOOLBAR_PUBLISH',true);
-			JToolbarHelper::unpublish('${vPlural}.unpublish','JTOOLBAR_UNPUBLISH',true);
-			JToolbarHelper::archiveList('${vPlural}.archive');
-			JToolbarHelper::checkin('${vPlural}.checkin');
+		if (\$canDo->get('core.edit.state'))
+		{
+			ToolbarHelper::publish('${vPlural}.publish','Toolbar_PUBLISH',true);
+			ToolbarHelper::unpublish('${vPlural}.unpublish','Toolbar_UNPUBLISH',true);
+			ToolbarHelper::archiveList('${vPlural}.archive');
+			ToolbarHelper::checkin('${vPlural}.checkin');
 		}
 
-		if (\$state->get('filter.published') == -2 && \$canDo->get('core.delete')) {
-			JToolbarHelper::deleteList('','${vPlural}.delete','JTOOLBAR_EMPTY_TRASH');
-		} elseif (\$canDo->get('core.edit.state')) {
-			JToolbarHelper::trash('${vPlural}.trash');
+		if (\$state->get('filter.published') === -2 && \$canDo->get('core.delete'))
+		{
+			ToolbarHelper::deleteList('','${vPlural}.delete','Toolbar_EMPTY_TRASH');
+		}
+		elseif (\$canDo->get('core.edit.state'))
+		{
+			ToolbarHelper::trash('${vPlural}.trash');
 		}
 
-		if (\$canDo->get('core.admin')) {
-			JToolbarHelper::preferences('com_${component_name}');
+		if (\$canDo->get('core.admin'))
+		{
+			ToolbarHelper::preferences('com_${component_name}');
 		}
 
-		JHtmlSidebar::setAction('index.php?option=com_${component_name}&view=${vPlural}');
-		JToolbarHelper::title(JText::_('CHANGE_TITLE'),'');
+		HTMLHelperSidebar::setAction('index.php?option=com_${component_name}&view=${vPlural}');
+		ToolbarHelper::title(Text::_('CHANGE_TITLE'),'');
 	}
 }
 	"
@@ -549,13 +650,17 @@ write_singular_edit_dot_php(){
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-\$doc = JFactory::getDocument();
-JHtml::_('behavior.formvalidator');
-JHtml::_('behavior.keepalive');
-JHtml::_('formbehavior.chosen','select',null,array('disable_search_threshold' => 0));
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Router\Route;
+
+\$doc = Factory::getDocument();
+HTMLHelper::_('behavior.formvalidator');
+HTMLHelper::_('behavior.keepalive');
+HTMLHelper::_('formbehavior.chosen','select',null,array('disable_search_threshold' => 0));
 ?>
 
-<form action=\"<?php echo JRoute::_('index.php?option=com_${component_name}&view=${vSingular}&layout=edit&id=' . (int) \$this->item->id); ?>\" name=\"adminForm\" id=\"adminForm\" method=\"post\" class=\"form-validate\">
+<form action=\"<?php echo Route::_('index.php?option=com_${component_name}&view=${vSingular}&layout=edit&id=' . (int) \$this->item->id); ?>\" name=\"adminForm\" id=\"adminForm\" method=\"post\" class=\"form-validate\">
 	<?php if (!empty(\$this->sidebar)) { ?>
     <div id=\"j-sidebar-container\" class=\"span2\">
 		<?php echo \$this->sidebar; ?>
@@ -573,7 +678,7 @@ JHtml::_('formbehavior.chosen','select',null,array('disable_search_threshold' =>
 	</div>
 
 	<input type=\"hidden\" name=\"task\" value=\"${vSingular}.edit\" />
-	<?php echo JHtml::_('form.token'); ?>
+	<?php echo HTMLHelper::_('form.token'); ?>
 	</div>
 </form>
 
@@ -594,16 +699,25 @@ write_plural_default_dot_php(){
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-\$user 		= JFactory::getUser();
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
+
+\$user 		= Factory::getUser();
 \$listOrder = \$this->escape(\$this->state->get('list.ordering'));
 \$listDirn 	= \$this->escape(\$this->state->get('list.direction'));
 \$canOrder 	= \$user->authorise('core.edit.state','com_${component_name}');
 \$saveOrder = (\$listOrder == 'a.ordering');
-if(\$saveOrder) {
+
+if(\$saveOrder)
+{
 	\$saveOrderingUrl = 'index.php?option=com_${component_name}&task=${vPlural}.saveOrderAjax&tmpl=component';
-	\$html = JHtml::_('sortablelist.sortable', '"${vSingular}"List','adminForm', strtolower(\$listDirn),\$saveOrderingUrl);
+	\$html = HTMLHelper::_('sortablelist.sortable', '"${vSingular}"List','adminForm', strtolower(\$listDirn),\$saveOrderingUrl);
 }
-JHtml::_('jquery.framework', false);
+
+HTMLHelper::_('jquery.framework', false);
 ?>
 
 <script type=\"text/javascript\">
@@ -620,7 +734,7 @@ JHtml::_('jquery.framework', false);
     }
 </script>
 
-<form action=\"<?php echo JRoute::_('index.php?option=com_${component_name}&view=${vPlural}'); ?>\" method=\"POST\" name=\"adminForm\" id=\"adminForm\">
+<form action=\"<?php echo Route::_('index.php?option=com_${component_name}&view=${vPlural}'); ?>\" method=\"POST\" name=\"adminForm\" id=\"adminForm\">
 	<?php if (!empty(\$this->sidebar)) { ?>
 	<div id=\"j-sidebar-container\" class=\"span2\">
 		<?php echo \$this->sidebar; ?>
@@ -631,38 +745,38 @@ JHtml::_('jquery.framework', false);
 			<div id=\"j-main-container\"></div>
 		<?php } ?>
 
-		<?php echo JLayoutHelper::render('joomla.searchtools.default', array('view' => \$this)); ?>
+		<?php echo LayoutHelper::render('joomla.searchtools.default', array('view' => \$this)); ?>
 		<div class=\"clearfix\"></div>
 		<?php if (!empty(\$this->items)) { ?>
 			<table class=\"table table-striped\" id=\""${vSingular}"List\">
 				<thead>
 					<tr>
 						<th class=\"nowrap center hidden-phone\" width=\"1%\">
-							<?php echo JHtml::_('grid.sort', '<i class=\"icon-menu-2\"></i>', 'a.ordering', \$listDirn, \$listOrder, null, 'asc', 'JGRID_HEADING_ORDERING'); ?>
+							<?php echo HTMLHelper::_('grid.sort', '<i class=\"icon-menu-2\"></i>', 'a.ordering', \$listDirn, \$listOrder, null, 'asc', 'JGRID_HEADING_ORDERING'); ?>
 						</th>
 
 						<th width=\"1%\" class=\"hidden-phone\">
-							<input type=\"checkbox\" name=\"checkall-toggle\" value=\"\" title=\"<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>\" onclick=\"Joomla.checkAll(this)\" />
+							<input type=\"checkbox\" name=\"checkall-toggle\" value=\"\" title=\"<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>\" onclick=\"Joomla.checkAll(this)\" />
 						</th>
 
 						<th width=\"1%\" class=\"nowrap center\">
-							<?php echo JHtml::_('grid.sort', 'JSTATUS', 'a.published', \$listDirn, \$listOrder); ?>
+							<?php echo HTMLHelper::_('grid.sort', 'JSTATUS', 'a.published', \$listDirn, \$listOrder); ?>
 						</th>
 
 						<th>
-							<?php echo JHtml::_('grid.sort','JGLOBAL_TITLE','a.title',\$listDirn,\$listOrder); ?>
+							<?php echo HTMLHelper::_('grid.sort','JGLOBAL_TITLE','a.title',\$listDirn,\$listOrder); ?>
 						</th>
 						
 						<th>
-							<?php echo JHtml::_('grid.sort','COM_${component_uca}_CREATED_BY','a.created_by',\$listDirn,\$listOrder); ?>
+							<?php echo HTMLHelper::_('grid.sort','COM_${component_uca}_CREATED_BY','a.created_by',\$listDirn,\$listOrder); ?>
 						</th>
 						
 						<th>
-							<?php echo JHtml::_('grid.sort','COM_${component_uca}_CREATED','a.created',\$listDirn,\$listOrder); ?>
+							<?php echo HTMLHelper::_('grid.sort','COM_${component_uca}_CREATED','a.created',\$listDirn,\$listOrder); ?>
 						</th>
 						
 						<th>
-							<?php echo JHtml::_('grid.sort','COM_${component_uca}_ID','a.id',\$listDirn,\$listOrder); ?>
+							<?php echo HTMLHelper::_('grid.sort','COM_${component_uca}_ID','a.id',\$listDirn,\$listOrder); ?>
 						</th>
 
 					</tr>
@@ -691,7 +805,7 @@ JHtml::_('jquery.framework', false);
 									\$disableClassName = '';
 									\$disabledLabel = '';
 									if(!\$saveOrder) :
-										\$disabledLabel = JText::_('JORDERINGDISABLED');
+										\$disabledLabel = Text::_('JORDERINGDISABLED');
 										\$disableClassName = 'inactive tip-top';
 									endif;
 									?>
@@ -708,17 +822,17 @@ JHtml::_('jquery.framework', false);
 							</td>
 
 							<td class=\"center hidden-phone\">
-								<?php echo JHtml::_('grid.id', \$i, \$item->id); ?>
+								<?php echo HTMLHelper::_('grid.id', \$i, \$item->id); ?>
 							</td>
 
 							<td class=\"center\">
 								<div class=\"btn-group\">
-									<?php echo JHtml::_('jgrid.published', \$item->published, \$i, '${vPlural}.', true,'cb');?>
+									<?php echo HTMLHelper::_('jgrid.published', \$item->published, \$i, '${vPlural}.', true,'cb');?>
 									<?php
 										if (\$canChange) {
-											JHtml::_('actionsdropdown.' . ((int) \$item->published === 2 ? 'un' : '') . 'archive', 'cb' . \$i, '${vPlural}');
-											JHtml::_('actionsdropdown.' . ((int) \$item->published === -2 ? 'un' : '') . 'trash', 'cb' . \$i, '${vPlural}');
-											echo JHtml::_('actionsdropdown.render', \$this->escape(\$item->title));
+											HTMLHelper::_('actionsdropdown.' . ((int) \$item->published === 2 ? 'un' : '') . 'archive', 'cb' . \$i, '${vPlural}');
+											HTMLHelper::_('actionsdropdown.' . ((int) \$item->published === -2 ? 'un' : '') . 'trash', 'cb' . \$i, '${vPlural}');
+											echo HTMLHelper::_('actionsdropdown.render', \$this->escape(\$item->title));
 										}
 									?>
 								</div>
@@ -726,11 +840,11 @@ JHtml::_('jquery.framework', false);
 
 							<td>
 								<?php if (\$item->checked_out) : ?>
-									<?php echo JHtml::_('jgrid.checkedout', \$i,\$item->editor, \$item->checked_out_time, '${vPlural}.', \$canCheckin); ?>
+									<?php echo HTMLHelper::_('jgrid.checkedout', \$i,\$item->editor, \$item->checked_out_time, '${vPlural}.', \$canCheckin); ?>
 								<?php endif; ?>
 
 								<?php if (\$canEdit) : ?>
-									<a class=\"title\" href=\"<?php echo JRoute::_('index.php?option=com_${component_name}&task=${vSingular}.edit&id='. \$item->id); ?>\">
+									<a class=\"title\" href=\"<?php echo Route::_('index.php?option=com_${component_name}&task=${vSingular}.edit&id='. \$item->id); ?>\">
 										<?php echo \$this->escape(\$item->title); ?>
 									</a>
 								<?php else : ?>
@@ -738,16 +852,16 @@ JHtml::_('jquery.framework', false);
 								<?php endif; ?>
 
 								<span class=\"small break-word\">
-									<?php echo JText::sprintf('JGLOBAL_LIST_ALIAS', \$this->escape(\$item->alias)); ?>
+									<?php echo Text::sprintf('JGLOBAL_LIST_ALIAS', \$this->escape(\$item->alias)); ?>
 								</span>
 							</td>
 
 							<td>
-								<?php echo JFactory::getUser(\$item->created_by)->get('username', \$item->created_by); ?>
+								<?php echo Factory::getUser(\$item->created_by)->get('username', \$item->created_by); ?>
 							</td>
 
 							<td>
-								<?php echo JHtml::_('date', \$item->created, 'd M, Y'); ?>
+								<?php echo HTMLHelper::_('date', \$item->created, 'd M, Y'); ?>
 							</td>
 							
 							<td>
@@ -758,14 +872,14 @@ JHtml::_('jquery.framework', false);
 				</tbody>
 			</table>
 		<?php } else { ?>
-			<div class=\"no-record-found\"><?php echo JText::_('COM_${component_uca}_NO_RECORD_FOUND'); ?></div>
+			<div class=\"no-record-found\"><?php echo Text::_('COM_${component_uca}_NO_RECORD_FOUND'); ?></div>
 		<?php } ?>
 
 		<input type=\"hidden\" name=\"task\" value=\"\" />
 		<input type=\"hidden\" name=\"boxchecked\" value=\"0\" />
 		<input type=\"hidden\" name=\"filter_order\" value=\"<?php echo \$listOrder; ?>\" />
 		<input type=\"hidden\" name=\"filter_order_Dir\" value=\"<?php echo \$lilstDirn; ?>\" />
-		<?php echo JHtml::_('form.token'); ?>
+		<?php echo HTMLHelper::_('form.token'); ?>
 	</div>
 </form>
 	"

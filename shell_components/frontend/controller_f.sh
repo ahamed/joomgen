@@ -28,11 +28,14 @@ controller_singular() {
 
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
+use Joomla\CMS\MVC\Controller\FormController;
 
-class ${component_ucf}Controller${singular_ucf} extends JControllerForm {
-
-	public function getModel(\$name = '${singular_ucf}', \$prefix = '${component_ucf}Controller', \$config = array('ignore_request' => true)) {
+class ${component_ucf}Controller${singular_ucf} extends FormController
+{
+	public function getModel(\$name = '${singular_ucf}', \$prefix = '${component_ucf}Controller', \$config = array('ignore_request' => true))
+	{
 		\$model = parent::getModel(\$name, \$prefix, \$config); 
+
 		return \$model; 
 	}
 	
@@ -53,9 +56,12 @@ controller_plural() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class ${component_ucf}Controller${plural_ucf} extends JControllerForm {
+use Joomla\CMS\MVC\Controller\FormController;
 
-	public function __construct(\$config = array()) {
+class ${component_ucf}Controller${plural_ucf} extends FormController
+{
+	public function __construct(\$config = array())
+	{
 		parent::__construct(\$config);
 	}
 }

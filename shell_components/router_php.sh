@@ -19,39 +19,48 @@ create_router_php() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class ${cname_ucf}Router extends JComponentRouterView
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Component\Router\RouterView;
+use Joomla\CMS\Component\Router\Rules\MenuRules;
+use Joomla\CMS\Component\Router\Rules\NomenuRules;
+use Joomla\CMS\Component\Router\Rules\StandardRules;
+
+class ${cname_ucf}Router extends RouterView
 {
 	protected \$noIDs = false;
 
 	public function __construct(\$app = null, \$menu = null)
 	{
-        \$params = JComponentHelper::getParams('com_${cName}');
+        \$params = ComponentHelper::getParams('com_${cName}');
 		\$this->noIDs = (bool) \$params->get('sef_ids', 1);
-        
+
         //Register your views here
-
-
         parent::__construct(\$app, \$menu);	
-		\$this->attachRule(new JComponentRouterRulesNomenu(\$this));
+		\$this->attachRule(new NomenuRules(\$this));
 
-		if (\$params->get('sef_advanced', 0)) {
-			\$this->attachRule(new JComponentRouterRulesMenu(\$this));
-			\$this->attachRule(new JComponentRouterRulesStandard(\$this));
-		} else {
+		if (\$params->get('sef_advanced', 0))
+		{
+			\$this->attachRule(new MenuRules(\$this));
+			\$this->attachRule(new StandardRules(\$this));
+		}
+		else
+		{
 			JLoader::register('${cname_ucf}RouterRulesLegacy', __DIR__ . '/helpers/legacyrouter.php');
 			\$this->attachRule(new ${cname_ucf}RouterRulesLegacy(\$this));
 		}
     }
 }
 
-function ${cName}BuildRoute(&\$query){
+function ${cName}BuildRoute(&\$query)
+{
 	\$app = JFactory::getApplication();
 	\$router = new ${cname_ucf}Router(\$app, \$app->getMenu());
 
 	return \$router->build(\$query);
 }
 
-function ${cName}ParseRoute(\$segments){
+function ${cName}ParseRoute(\$segments)
+{
 	\$app = JFactory::getApplication();
 	\$router = new ${cname_ucf}Router(\$app, \$app->getMenu());
 

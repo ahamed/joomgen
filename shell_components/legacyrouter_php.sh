@@ -20,17 +20,25 @@ create_legacyrouter_php() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class ${name_ucf}RouterRulesLegacy implements JComponentRouterRulesInterface {
+use Joomla\CMS\Factory;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Component\Router\Rules\RulesInterface;
 
-	public function __construct(\$router) {
+class ${name_ucf}RouterRulesLegacy implements RulesInterface
+{
+
+	public function __construct(\$router)
+	{
 		\$this->router = \$router;
 	}
 
-	public function preprocess(&\$query) {
+	public function preprocess(&\$query)
+	{
 	}
 
-	public function build(&\$query, &\$segments) {
-		\$params 	= JComponentHelper::getParams('com_${cName}');
+	public function build(&\$query, &\$segments)
+	{
+		\$params 	= ComponentHelper::getParams('com_${cName}');
 		\$advanced 	= \$params->get('sef_advanced_link', 0);
 
 		if (empty(\$query['Itemid']))
@@ -67,7 +75,8 @@ class ${name_ucf}RouterRulesLegacy implements JComponentRouterRulesInterface {
 		if (\$menuItem !== null
 		&& isset(\$menuItem->query['view'], \$query['view'], \$menuItem->query['id'], \$query['id'])
 		&& \$menuItem->query['view'] == \$query['view']
-		&& \$menuItem->query['id'] == (int) \$query['id']) {
+		&& \$menuItem->query['id'] == (int) \$query['id'])
+		{
 			unset(\$query['view']);
 
 			if (isset(\$query['catid']))
@@ -84,12 +93,15 @@ class ${name_ucf}RouterRulesLegacy implements JComponentRouterRulesInterface {
 
 			return;
 		}
-        foreach(\$segments as \$i => &\$segment) {
+
+        foreach(\$segments as \$i => &\$segment)
+		{
 			\$segment = str_replace(':', '-', \$segment);
 		}
     }
 
-    public function parse(&\$segments, &\$vars) {
+    public function parse(&\$segments, &\$vars)
+	{
 		\$total = count(\$segments);
 
 		for (\$i = 0; \$i < \$total; \$i++)
@@ -99,16 +111,18 @@ class ${name_ucf}RouterRulesLegacy implements JComponentRouterRulesInterface {
 
 		// Get the active menu item.
 		\$item 		= \$this->router->menu->getActive();
-		\$params 	= JComponentHelper::getParams('com_${cName}');
+		\$params 	= ComponentHelper::getParams('com_${cName}');
 		\$advanced 	= \$params->get('sef_advanced_link', 0);
-		\$db 		= JFactory::getDbo();
+		\$db 		= Factory::getDbo();
 
 		// Count route segments
 		\$count = count(\$segments);
 
-		if (!isset(\$item)) {
+		if (!isset(\$item))
+		{
 			\$vars['view'] 	= \$segments[0];
 			\$vars['id']	= \$segments[\$count - 1];
+
 			return;
 		}
     }

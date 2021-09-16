@@ -20,19 +20,27 @@ create_frontend_helper() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class ${name_ucf}Helper {
+use Joomla\CMS\Language\Text;
+
+class ${name_ucf}Helper
+{
 	
-	public static function debug(\$data, \$die = true) {
+	public static function debug(\$data, \$die = true)
+	{
 		echo \"<pre>\"; print_r(\$data); echo \"</pre>\";
 		if (\$die) die;
 	}
 
-	public static function pluralize(\$amount, \$singular, \$plural) {
+	public static function pluralize(\$amount, \$singular, \$plural)
+	{
 		\$amount = (int)\$amount;
-		if (\$amount <= 1) {
-			return JText::_(\$singular);
+
+		if (\$amount <= 1)
+		{
+			return Text::_(\$singular);
 		}
-		return JText::_(\$plural);
+
+		return Text::_(\$plural);
 	}
 }
     "

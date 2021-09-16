@@ -29,7 +29,9 @@ view_html_singular() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class ${component_ucf}View${singular_ucf} extends JViewLegacy {
+use Joomla\CMS\MVC\View\HtmlView;
+
+class ${component_ucf}View${singular_ucf} extends HtmlView {
 
     protected \$item;
 
@@ -56,12 +58,16 @@ view_html_plural() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class ${component_ucf}View${plural_ucf} extends JViewLegacy {
+use Joomla\CMS\MVC\View\HtmlView;
+
+class ${component_ucf}View${plural_ucf} extends HtmlView
+{
 
     protected \$items; 
 	protected \$pagination;
 
-    public function display(\$tpl = null) {
+    public function display(\$tpl = null)
+    {
         \$model 			= \$this->getModel();
 		\$this->items		= \$this->get('Items');
 		\$this->pagination	= \$this->get('Pagination');

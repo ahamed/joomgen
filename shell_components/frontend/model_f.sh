@@ -29,18 +29,22 @@ model_singular() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
-class ${component_ucf}Model${singular_ucf} extends JModelItem {
+use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Model\ItemModel;
+use Joomla\CMS\Language\Multilanguage;
+
+class ${component_ucf}Model${singular_ucf} extends ItemModel {
     protected \$_context = 'com_${component_name}.${vSingular}';
 
     protected function populateState() {
-		\$app = JFactory::getApplication('site');
+		\$app = Factory::getApplication('site');
 		\$itemId = \$app->input->getInt('id');
 		\$this->setState('${vSingular}.id', \$itemId);
-		\$this->setState('filter.language', JLanguageMultilang::isEnabled());
+		\$this->setState('filter.language', Multilanguage::isEnabled());
 	}
 
     public function getItem( \$itemId = null ) {
-		\$user = JFactory::getUser();
+		\$user = Factory::getUser();
 		\$itemId = (!empty(\$itemId))? \$itemId : (int)\$this->getState('${vSingular}.id');
 		
 		if ( \$this->_item == null ) {
@@ -59,7 +63,7 @@ class ${component_ucf}Model${singular_ucf} extends JModelItem {
 				\$query->where('a.published = 1');
 
 				if (\$this->getState('filter.language')) {
-					\$query->where('a.language in (' . \$db->quote(JFactory::getLanguage()->getTag()) . ',' . \$db->quote('*') . ')');
+					\$query->where('a.language in (' . \$db->quote(Factory::getLanguage()->getTag()) . ',' . \$db->quote('*') . ')');
 				}
 
 				//Authorised
@@ -99,19 +103,23 @@ model_plural() {
 
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
+use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Model\ListModel;
+use Joomla\CMS\Language\Multilanguage;
 
 jimport( 'joomla.application.component.helper' );
 
-class ${component_ucf}Model${plural_ucf} extends JModelList {
-
-
-	protected function populateState(\$ordering = null, \$direction = null) {
-		\$app = JFactory::getApplication('site');
+class ${component_ucf}Model${plural_ucf} extends ListModel
+{
+	protected function populateState(\$ordering = null, \$direction = null)
+	{
+		\$app = Factory::getApplication('site');
 		\$this->setState('list.start', \$app->input->get('limitstart', 0, 'uint'));
-		\$this->setState('filter.language', JLanguageMultilang::isEnabled());
+		\$this->setState('filter.language', Multilanguage::isEnabled());
 	}
 
-	protected function getListQuery() {
+	protected function getListQuery()
+	{
 		\$db = \$this->getDbo();
 		\$query = \$db->getQuery(true);
 		\$query->select('a.*');
@@ -120,7 +128,7 @@ class ${component_ucf}Model${plural_ucf} extends JModelList {
         \$query->where(\$db->quoteName('a.published') . ' = ' . \$db->quote('1'));
 
         if (\$this->getState('filter.language')) {
-            \$query->where(\$db->quoteName('a.language') . ' IN (' . \$db->quote(JFactory::getLanguage()->getTag()) . ',' . \$db->quote('*') . ')');
+            \$query->where(\$db->quoteName('a.language') . ' IN (' . \$db->quote(Factory::getLanguage()->getTag()) . ',' . \$db->quote('*') . ')');
         }
 		return \$query;
 	}

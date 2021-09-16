@@ -20,26 +20,34 @@ create_component_name_php() {
 // No Direct Access
 defined ('_JEXEC') or die('Resticted Aceess');
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Launguage\Text;
+use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Uri\Uri;
+
 //helper & model
 \$com_helper = JPATH_BASE . '/components/com_${cName}/helpers/helper.php';
 
-if ( file_exists(\$com_helper) ) {
+if (file_exists(\$com_helper))
+{
     require_once(\$com_helper);
-} else {
-	echo '<p class=\"alert alert-warning\">' . JText::_('COM_${cname_uca}_COMPONENT_NOT_INSTALLED_OR_MISSING_FILE') . '</p>';
+}
+else
+{
+	echo '<p class=\"alert alert-warning\">' . Text::_('COM_${cname_uca}_COMPONENT_NOT_INSTALLED_OR_MISSING_FILE') . '</p>';
 	return;
 }
 
-
-JHtml::_('jquery.framework');
-\$doc = JFactory::getDocument();
+HTMLHelper::_('jquery.framework');
+\$doc = Factory::getDocument();
 
 // Include CSS files
-\$doc->addStylesheet( JURI::root(true) . '/components/com_${cName}/assets/css/style.css');
+\$doc->addStylesheet(Uri::root(true) . '/components/com_${cName}/assets/css/style.css');
 
 
-\$controller = JControllerLegacy::getInstance('${name_ucf}');
-\$input 	= JFactory::getApplication()->input;
+\$controller = BaseController::getInstance('${name_ucf}');
+\$input 	= Factory::getApplication()->input;
 \$view 		= \$input->getCmd('view','default');
 \$input->set('view', \$view);
 \$controller->execute(\$input->getCmd('task'));
