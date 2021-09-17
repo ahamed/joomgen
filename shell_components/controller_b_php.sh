@@ -20,30 +20,31 @@ create_controller_b_php() {
 defined ('_JEXEC') or die('Resticted Aceess');
 
 use Joomla\CMS\Lanugage\Text;
+use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Router\Route;
 
-class ${cname_ucf}Controller extends JControllerLegacy
+class ${cname_ucf}Controller extends BaseController
 {
+	public function display(\$cachable=false,\$urlparams=false)
+	{
+		\$view   = \$this->input->get('view','default_view_plural');
+		\$layout = \$this->input->get('layout','default');
+		\$id     = \$this->input->getInt('id');
+		\$this->input->set('view',\$view);
 
-  public function display(\$cachable=false,\$urlparams=false)
-  {
-    \$view   = \$this->input->get('view','default_view_plural');
-    \$layout = \$this->input->get('layout','default');
-    \$id     = \$this->input->getInt('id');
-    \$this->input->set('view',\$view);
-    
-    if(\$view == 'default_view_singular' && \$layout == 'edit' && !\$this->checkEditId('com_${cName}.edit.default_view_singular',\$id))
-    {
-      \$this->setError(Text::sprintf('JLIB_APPLICATION_ERROR_UNHELD_ID',\$id));
-      \$this->setMessage(\$this->getError(),'error');
-      \$this->setRedirect(JRoute::_('index.php?option=com_${cName}&view=default_view_plural',false));
+		if(\$view == 'default_view_singular' && \$layout == 'edit' && !\$this->checkEditId('com_${cName}.edit.default_view_singular',\$id))
+		{
+			\$this->setError(Text::sprintf('JLIB_APPLICATION_ERROR_UNHELD_ID',\$id));
+			\$this->setMessage(\$this->getError(),'error');
+			\$this->setRedirect(Route::_('index.php?option=com_${cName}&view=default_view_plural',false));
 
-      return false;
-    }
+			return false;
+		}
 
-    parent::display(\$cachable,\$urlparams);
+		parent::display(\$cachable,\$urlparams);
 
-    return \$this;
-  }
+		return \$this;
+	}
 }
 "
 }

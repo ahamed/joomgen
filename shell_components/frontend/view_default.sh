@@ -30,7 +30,9 @@ default_view_singular() {
 defined ('_JEXEC') or die('Resticted Aceess');
 
 ?>
-    "
+<h4>Detail View</h4>
+<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis, exercitationem inventore quod facilis laudantium ut minus molestiae reiciendis. Esse consectetur sunt suscipit numquam quos sint blanditiis distinctio labore quaerat fuga?</p>
+"
 }
 default_view_plural() {
     
@@ -47,7 +49,9 @@ default_view_plural() {
 defined ('_JEXEC') or die('Resticted Aceess');
 
 ?>
-    "
+<h4>List View</h4>
+<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis, exercitationem inventore quod facilis laudantium ut minus molestiae reiciendis. Esse consectetur sunt suscipit numquam quos sint blanditiis distinctio labore quaerat fuga?</p>
+"
 }
 
 default_xml() {

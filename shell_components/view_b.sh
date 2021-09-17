@@ -491,8 +491,9 @@ write_singular_view_dot_html(){
 defined ('_JEXEC') or die('Resticted Aceess');
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView;
+use Joomla\CMS\Toolbar\ToolbarHelper;
 
 class "${component_ucf}"View"${singular_ucf}" extends HtmlView
 {
@@ -556,6 +557,8 @@ write_plural_view_dot_html(){
 defined ('_JEXEC') or die('Resticted Aceess');
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Helper\ContentHelper;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
@@ -585,7 +588,7 @@ class "${component_ucf}"View"${plural_ucf}" extends HtmlView
 		}
 
 		\$this->addToolbar();
-		\$this->sidebar = HTMLHelperSidebar::render();
+		\$this->sidebar = JHtmlSidebar::render();
 
 		return parent::display(\$tpl);
 	}
@@ -593,7 +596,7 @@ class "${component_ucf}"View"${plural_ucf}" extends HtmlView
 	protected function addToolbar()
 	{
 		\$state	= \$this->get('State');
-		\$canDo	= "${component_ucf}"Helper::getActions('com_${component_name}','component');
+		\$canDo	= ContentHelper::getActions('com_${component_name}','component');
 		\$user	= Factory::getUser();
 		\$bar	= Toolbar::getInstance('toolbar');
 
@@ -629,7 +632,7 @@ class "${component_ucf}"View"${plural_ucf}" extends HtmlView
 			ToolbarHelper::preferences('com_${component_name}');
 		}
 
-		HTMLHelperSidebar::setAction('index.php?option=com_${component_name}&view=${vPlural}');
+		JHtmlSidebar::setAction('index.php?option=com_${component_name}&view=${vPlural}');
 		ToolbarHelper::title(Text::_('CHANGE_TITLE'),'');
 	}
 }
