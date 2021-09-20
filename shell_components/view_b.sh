@@ -29,7 +29,6 @@ table_name="#__${component_name}_${vPlural}"
 write_singular_controller(){
 	echo "
 <?php
-
 /**
 * @package com_${component_name}
 * @author JoomShaper http://www.joomshaper.com
@@ -38,11 +37,13 @@ write_singular_controller(){
 */
 
 // No Direct Access
-defined ('_JEXEC') or die('Resticted Aceess');
+defined ('_JEXEC') or die('Restricted Access');
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Controller\FormController;
 
-class "${component_ucf}"Controller"${singular_ucf}" extends JControllerForm {
+class "${component_ucf}"Controller"${singular_ucf}" extends FormController
+{
 	public function __construct(\$config = array())
 	{
 		parent::__construct(\$config);
@@ -82,7 +83,6 @@ class "${component_ucf}"Controller"${singular_ucf}" extends JControllerForm {
 write_plural_controller(){
 		echo "
 <?php
-
 /**
 * @package com_${component_name}
 * @author JoomShaper http://www.joomshaper.com
@@ -91,11 +91,13 @@ write_plural_controller(){
 */
 
 // No Direct Access
-defined ('_JEXEC') or die('Resticted Aceess');
+defined ('_JEXEC') or die('Restricted Access');
+
 use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Controller\AdminController;
 use Joomla\Utilities\ArrayHelper;
 
-class "${component_ucf}"Controller"${plural_ucf}" extends JControllerAdmin
+class "${component_ucf}"Controller"${plural_ucf}" extends AdminController
 {
 	public function getModel(\$name = '${singular_ucf}', \$prefix = '"${component_ucf}"Model', \$config = array('ignore_request' => true))
 	{
@@ -109,7 +111,6 @@ class "${component_ucf}"Controller"${plural_ucf}" extends JControllerAdmin
 write_singular_model(){
 	echo "
 <?php
-
 /**
 * @package com_${component_name}
 * @author JoomShaper http://www.joomshaper.com
@@ -118,12 +119,14 @@ write_singular_model(){
 */
 
 // No Direct Access
-defined ('_JEXEC') or die('Resticted Aceess');
+defined ('_JEXEC') or die('Restricted Access');
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\Table\Table;
+use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\String\StringHelper;
 
-class "${component_ucf}"Model"${singular_ucf}" extends JModelAdmin
+class "${component_ucf}"Model"${singular_ucf}" extends AdminModel
 {
 	protected \$text_prefix = 'COM_${component_uca}';
 
@@ -234,7 +237,6 @@ class "${component_ucf}"Model"${singular_ucf}" extends JModelAdmin
 write_plural_model(){
 	echo "
 <?php
-
 /**
 * @package com_${component_name}
 * @author JoomShaper http://www.joomshaper.com
@@ -243,11 +245,12 @@ write_plural_model(){
 */
 
 // No Direct Access
-defined ('_JEXEC') or die('Resticted Aceess');
+defined ('_JEXEC') or die('Restricted Access');
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Model\ListModel;
 
-class "${component_ucf}"Model"${plural_ucf}" extends JModelList
+class "${component_ucf}"Model"${plural_ucf}" extends ListModel
 {
 	public function __construct(array \$config = array())
 	{
@@ -338,7 +341,6 @@ class "${component_ucf}"Model"${plural_ucf}" extends JModelList
 write_table(){
 	echo "
 <?php
-
 /**
 * @package com_${component_name}
 * @author JoomShaper http://www.joomshaper.com
@@ -347,7 +349,7 @@ write_table(){
 */
 
 // No Direct Access
-defined ('_JEXEC') or die('Resticted Aceess');
+defined ('_JEXEC') or die('Restricted Access');
 
 use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Date\Date;
@@ -479,7 +481,6 @@ class "${component_ucf}"Table"${singular_ucf}" extends Table
 write_singular_view_dot_html(){
 	echo "
 <?php
-
 /**
 * @package com_${component_name}
 * @author JoomShaper http://www.joomshaper.com
@@ -488,12 +489,13 @@ write_singular_view_dot_html(){
 */
 
 // No Direct Access
-defined ('_JEXEC') or die('Resticted Aceess');
+defined ('_JEXEC') or die('Restricted Access');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Helper\ContentHelper;
 
 class "${component_ucf}"View"${singular_ucf}" extends HtmlView
 {
@@ -507,8 +509,7 @@ class "${component_ucf}"View"${singular_ucf}" extends HtmlView
 
 		if (count(\$errors = \$this->get('Errors')))
 		{
-			JError::raiseError(500, implode('<br>',\$errors));
-			return false;
+			throw new \Exception(implode('<br>',\$errors), 500);
 		}
 
 		\$this->addToolbar();
@@ -524,19 +525,19 @@ class "${component_ucf}"View"${singular_ucf}" extends HtmlView
 		\$user = Factory::getUser();
 		\$userId = \$user->get('id');
 		\$isNew = \$this->item->id == 0;
-		\$canDo = "${component_ucf}"Helper::getActions('com_${component_name}','component');
+		\$canDo = ContentHelper::getActions('com_${component_name}','component');
 
 		ToolbarHelper::title(Text::_('COM_${component_uca}_${singular_uca}_TITLE_' . (\$isNew ? 'ADD' : 'EDIT')), '');
 
 		if (\$canDo->get('core.edit'))
 		{
-			ToolbarHelper::apply('${vSingular}.apply','Toolbar_APPLY');
-			ToolbarHelper::save('${vSingular}.save','Toolbar_SAVE');
+			ToolbarHelper::apply('${vSingular}.apply','JTOOLBAR_APPLY');
+			ToolbarHelper::save('${vSingular}.save','JTOOLBAR_SAVE');
 			ToolbarHelper::save2new('${vSingular}.save2new');
 			ToolbarHelper::save2copy('${vSingular}.save2copy');
 		}
 
-		ToolbarHelper::cancel('${vSingular}.cancel','Toolbar_CLOSE');
+		ToolbarHelper::cancel('${vSingular}.cancel','JTOOLBAR_CLOSE');
 	}
 }
 	"
@@ -545,7 +546,6 @@ class "${component_ucf}"View"${singular_ucf}" extends HtmlView
 write_plural_view_dot_html(){
 	echo "
 <?php
-
 /**
 * @package com_${component_name}
 * @author JoomShaper http://www.joomshaper.com
@@ -554,7 +554,7 @@ write_plural_view_dot_html(){
 */
 
 // No Direct Access
-defined ('_JEXEC') or die('Resticted Aceess');
+defined ('_JEXEC') or die('Restricted Access');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Helper\ContentHelper;
@@ -582,9 +582,9 @@ class "${component_ucf}"View"${plural_ucf}" extends HtmlView
 
 		"${component_ucf}"Helper::addSubmenu('${vPlural}');
 
-		if (count(\$errors = \$this->get('Errors'))) {
-			JError::raiseError(500,implode('<br>', \$errors));
-			return false;
+		if (count(\$errors = \$this->get('Errors')))
+		{
+			throw new \Exception(implode('<br>',\$errors), 500);
 		}
 
 		\$this->addToolbar();
@@ -612,15 +612,15 @@ class "${component_ucf}"View"${plural_ucf}" extends HtmlView
 
 		if (\$canDo->get('core.edit.state'))
 		{
-			ToolbarHelper::publish('${vPlural}.publish','Toolbar_PUBLISH',true);
-			ToolbarHelper::unpublish('${vPlural}.unpublish','Toolbar_UNPUBLISH',true);
+			ToolbarHelper::publish('${vPlural}.publish','JTOOLBAR_PUBLISH',true);
+			ToolbarHelper::unpublish('${vPlural}.unpublish','JTOOLBAR_UNPUBLISH',true);
 			ToolbarHelper::archiveList('${vPlural}.archive');
 			ToolbarHelper::checkin('${vPlural}.checkin');
 		}
 
 		if (\$state->get('filter.published') === -2 && \$canDo->get('core.delete'))
 		{
-			ToolbarHelper::deleteList('','${vPlural}.delete','Toolbar_EMPTY_TRASH');
+			ToolbarHelper::deleteList('','${vPlural}.delete','JTOOLBAR_EMPTY_TRASH');
 		}
 		elseif (\$canDo->get('core.edit.state'))
 		{
@@ -642,7 +642,6 @@ class "${component_ucf}"View"${plural_ucf}" extends HtmlView
 write_singular_edit_dot_php(){
 	echo "
 <?php
-
 /**
 * @package com_${component_name}
 * @author JoomShaper http://www.joomshaper.com
@@ -651,7 +650,7 @@ write_singular_edit_dot_php(){
 */
 
 // No Direct Access
-defined ('_JEXEC') or die('Resticted Aceess');
+defined ('_JEXEC') or die('Restricted Access');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -691,7 +690,6 @@ HTMLHelper::_('formbehavior.chosen','select',null,array('disable_search_threshol
 write_plural_default_dot_php(){
 	echo "
 <?php
-
 /**
 * @package com_${component_name}
 * @author JoomShaper http://www.joomshaper.com
@@ -700,7 +698,7 @@ write_plural_default_dot_php(){
 */
 
 // No Direct Access
-defined ('_JEXEC') or die('Resticted Aceess');
+defined ('_JEXEC') or die('Restricted Access');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
